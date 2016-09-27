@@ -233,3 +233,4 @@ javawrapper/device/samples/file-upload-sample/target
 javawrapper/device/samples/send-event-sample/target
 javawrapper/device/test/target
 javawrapper/device/samples/target
+*.lock.json

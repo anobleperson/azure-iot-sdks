@@ -8,8 +8,11 @@ namespace Microsoft.Azure.Devices.Client
     using System.Collections.Generic;
     using System.Globalization;
     using System.Text;
-    using PCLCrypto;
-
+    #if !DOTNETCORE
+        using PCLCrypto;
+    #else
+        using System.Security.Cryptography;
+    #endif
     sealed class SharedAccessSignature : ISharedAccessSignatureCredential
     {
         readonly string iotHubName;
@@ -193,6 +196,7 @@ namespace Microsoft.Azure.Devices.Client
             }
         }
 
+#if !DOTNETCORE
         public string ComputeSignature(byte[] key)
         {
             var fields = new List<string>();
@@ -205,6 +209,18 @@ namespace Microsoft.Azure.Devices.Client
             var mac = hash.GetValueAndReset();
             return Convert.ToBase64String(mac);
         }
+#else
+        public string ComputeSignature(byte[] key)
+        {
+            var fields = new List<string>();
+            fields.Add(this.encodedAudience);
+            fields.Add(this.expiry);
+            string value = string.Join("\n", fields);
+            var hmacsha256 = new HMACSHA256(key);
+            var hash = hmacsha256.ComputeHash(Encoding.UTF8.GetBytes(value));
+            return Convert.ToBase64String(hash);
+        }
+#endif
 
         static IDictionary<string, string> ExtractFieldValues(string sharedAccessSignature)
         {

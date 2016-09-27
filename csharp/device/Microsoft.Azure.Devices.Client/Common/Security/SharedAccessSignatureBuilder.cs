@@ -8,8 +8,13 @@ namespace Microsoft.Azure.Devices.Client
     using Microsoft.Azure.Devices.Client.Extensions;
 #if !NETMF
     using System.Collections.Generic;
+#if !DOTNETCORE
     using PCLCrypto;
+#else
+    using System.Security.Cryptography;
 #endif
+#endif
+
     using System.Globalization;
 #if WINDOWS_UWP
     using Windows.Security.Cryptography;
@@ -140,6 +145,13 @@ namespace Microsoft.Azure.Devices.Client
             // computing SHA256 signature using a managed code library
             var hmac = SHA.computeHMAC_SHA256(Convert.FromBase64String(key), Encoding.UTF8.GetBytes(requestString));
             return Convert.ToBase64String(hmac);
+        }
+#elif DOTNETCORE
+        static string Sign(string requestString, string key)
+        {
+            var hmac = new HMACSHA256(Convert.FromBase64String(key));
+            var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(requestString));
+            return Convert.ToBase64String(hash);
         }
 #else
         static string Sign(string requestString, string key)

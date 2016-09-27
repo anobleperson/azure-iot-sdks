@@ -55,7 +55,9 @@ namespace Microsoft.Azure.Devices.Client
             {
                 throw new ArgumentNullException("dictionary");
             }
+#if !DOTNETCORE
             Contract.EndContractBlock();
+#endif
             m_dictionary = dictionary;
             m_readOnlyIndicator = readOnlyIndicator;
         }
@@ -69,7 +71,9 @@ namespace Microsoft.Azure.Devices.Client
         {
             get
             {
+#if !DOTNETCORE
                 Contract.Ensures(Contract.Result<KeyCollection>() != null);
+#endif
                 if (m_keys == null)
                 {
                     m_keys = new KeyCollection(m_dictionary.Keys, this.m_readOnlyIndicator);
@@ -82,7 +86,9 @@ namespace Microsoft.Azure.Devices.Client
         {
             get
             {
+#if !DOTNETCORE
                 Contract.Ensures(Contract.Result<ValueCollection>() != null);
+#endif
                 if (m_values == null)
                 {
                     m_values = new ValueCollection(m_dictionary.Values, this.m_readOnlyIndicator);
